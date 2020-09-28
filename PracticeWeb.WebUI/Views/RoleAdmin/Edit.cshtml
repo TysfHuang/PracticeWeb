@@ -1,0 +1,70 @@
+﻿@using Practice.Domain.Entities
+@using PracticeWeb.WebUI.Models
+@model RoleEditModel
+
+@{
+    ViewBag.Title = "Edit Role";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section CategoryMenu{
+    @Html.Action("Menu", "Admin", new { selectedCategory = "Index" })
+}
+
+<div class="panel panel-primary" style="margin:20px;">
+    @Html.ValidationSummary()
+    @using (Html.BeginForm())
+    {
+        <input type="hidden" name="roleName" value="@Model.Role.Name" />
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3>新增至 @Model.Role.Name</h3>
+            </div>
+            <table class="table table-striped">
+                @if (Model.NonMembers.Count() == 0)
+                {
+                    <tr><td colspan="2">All Users Are Members</td></tr>
+                }
+                else
+                {
+                    <tr><td>User ID</td><td>Add To Role</td></tr>
+                    foreach (AppUser user in Model.NonMembers)
+                    {
+                        <tr>
+                            <td>@user.UserName</td>
+                            <td>
+                                <input type="checkbox" name="IdsToAdd" value="@user.Id">
+                            </td>
+                        </tr>
+                    }
+                }
+            </table>
+        </div>
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3>移除自 @Model.Role.Name</h3>
+            </div>
+            <table class="table table-striped">
+                @if (Model.Members.Count() == 0)
+                {
+                    <tr><td colspan="2">No Users Are Members</td></tr>
+                }
+                else
+                {
+                    <tr><td>User ID</td><td>Remove From Role</td></tr>
+                    foreach (AppUser user in Model.Members)
+                    {
+                        <tr>
+                            <td>@user.UserName</td>
+                            <td>
+                                <input type="checkbox" name="IdsToDelete" value="@user.Id">
+                            </td>
+                        </tr>
+                    }
+                }
+            </table>
+        </div>
+        <button type="submit" class="btn btn-outline-primary">儲存</button>
+        @Html.ActionLink("取消", "Index", null, new { @class = "btn btn-outline-danger" })
+    }
+</div>

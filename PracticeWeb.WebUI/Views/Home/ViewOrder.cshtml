@@ -1,0 +1,63 @@
+﻿@using PracticeWeb.WebUI.Models
+@model IEnumerable<UserOrderViewModel>
+
+@{
+    ViewBag.Title = "檢視訂單";
+}
+
+@section CategoryMenu{
+    @Html.Action("Menu", "Nav")
+}
+
+<div style="margin:20px">
+    <h3>訂購紀錄</h3>
+    @if (Model == null || Model.Count() == 0)
+    {
+        <div class="alert alert-dismissible alert-success" style="margin:20px;">
+            <strong>沒有訂購紀錄！</strong>
+        </div>
+    }
+    else
+    {
+        foreach (UserOrderViewModel data in Model)
+        {
+            <div class="container border" style="margin-top:10px">
+                <h6>收件人：@data.ReceiverName</h6>
+                <p>下單時間：@data.Date</p>
+                <p>寄送地址：@data.ShippingAddress</p>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>商品名稱</th>
+                            <th>數量</th>
+                            <th>單價</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (List<string> product in data.ProductList)
+                        {
+                            <tr>
+                                <td>
+                                    <a href=@Url.RouteUrl(new { controller = "Home", action = "ProductDetail", productID = product[0] })>
+                                        @product[1]
+                                    </a>
+                                </td>
+                                <td>@product[2]</td>
+                                <td>@product[3]</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <h6 class="text-right">總價：@data.ComputeTotalPrice()</h6>
+            </div>
+        }
+    }
+</div>
+
+<div>
+    @Html.PageLinks((PagingInfo)ViewBag.PagingInfo, x => Url.Action("ViewOrder",
+    new
+        {
+            page = x
+        }))
+</div>

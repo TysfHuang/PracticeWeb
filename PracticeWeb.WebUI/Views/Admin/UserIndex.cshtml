@@ -1,0 +1,43 @@
+﻿@using Practice.Domain.Entities;
+@model IEnumerable<AppUser>
+
+@{
+    ViewBag.Title = "會員清單";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section CategoryMenu{
+    @Html.Action("Menu", "Admin", new { selectedCategory = "UserIndex" })
+}
+
+<div class="panel panel-primary">
+    <div class="panel-heading" style="margin:20px;">
+        <h3>會員清單</h3>
+    </div>
+    <table class="table table-striped">
+        <tr><th>ID</th><th>Name</th><th>Email</th><th></th></tr>
+        @if (Model.Count() == 0)
+        {
+            <tr><td colspan="4" class="text-center">No User Accounts</td></tr>
+        }
+        else
+        {
+            foreach (AppUser user in Model)
+            {
+                <tr>
+                    <td>@user.Id</td>
+                    <td>@user.UserName</td>
+                    <td>@user.Email</td>
+                    <td>
+                        @using (Html.BeginForm("UserDelete", "Admin", new { id = user.Id }))
+                        {
+                            @Html.ActionLink("檢視", "UserView", new { id = user.Id }, new { @class = "btn btn-outline-primary" })
+                            <button class="btn btn-outline-danger" type="submit">刪除</button>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+    </table>
+</div>
+@Html.ActionLink("新增帳號", "UserCreate", null, new { @class = "btn btn-primary" })

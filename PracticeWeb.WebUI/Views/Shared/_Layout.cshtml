@@ -1,0 +1,50 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Tech Store</title>
+    <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/ErrorStyles.css" rel="stylesheet" />
+    <script src="~/Scripts/modernizr-2.8.3.js"></script>
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script src="~/Scripts/knockout-3.5.1.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+            <a class="navbar-brand" href=@Url.Action("Index", "Home", new { area = "" })>Tech Store</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarColor02">
+                <div class="navbar-nav mr-auto"></div>
+                @Html.Action("BtnOnNavBar", "Account")
+                @Html.Action("Summary", "Cart")
+            </div>
+        </nav>
+    </header>
+
+    <div class="row panel container-fluid">
+        <div id="categories" class="col-sm-3 col-md-6 col-lg-4 col-xl-2">
+            @RenderSection("CategoryMenu")
+        </div>
+        <div class="col-sm-9 col-md-6 col-lg-8 col-xl-10">
+            @if (TempData["message"] != null)
+            {
+                <div class="alert alert-success">@TempData["message"]</div>
+            }
+            @RenderBody()
+        </div>
+    </div>
+
+    @*<footer>
+        <p style="text-align:right;">&copy; @DateTime.Now.Year - My ASP.NET PracticeWeb Application</p>
+    </footer>*@
+</body>
+</html>

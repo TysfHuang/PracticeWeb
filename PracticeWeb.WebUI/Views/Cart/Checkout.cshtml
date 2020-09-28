@@ -1,0 +1,70 @@
+﻿@model Practice.Domain.Entities.ShippingDetails
+
+@{
+    ViewBag.Title = "TechStore: 結帳";
+}
+
+@section CategoryMenu{
+    @Html.Action("Menu", "Nav")
+}
+
+<script type="text/javascript">
+    $(document).ready(getJsonWhenCityListChange);
+
+    function getJsonWhenCityListChange() {
+        $("#CityID").change(function () {
+            var strSelected = "";
+            $("#CityID option:selected").each(function () {
+                strSelected += $(this)[0].value;
+            });
+
+            var url = "/Cart/GetCountrySelectListItemJson/?cityID=" + strSelected;
+            $.getJSON(url, function (data) {
+                var target = $("#CountryID");
+                target.empty();
+                for (var i = 0; i < data.length; i++) {
+                    var country = data[i];
+                    target.append("<option value=\"" + country.Value + "\" >" + country.Text + "</option>");
+                }
+            });
+        });
+    }
+</script>
+
+<div style="margin-top:30px">
+    <h2>結帳</h2>
+    <p>請輸入寄送資訊，我們會儘快送到您手上!</p>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary()
+        <h3>寄送至</h3>
+
+        <div class="form-group">
+            <h5>收件人</h5>
+            @Html.TextBoxFor(x => x.ReceiverName, new { @class = "form-control" })
+            @Html.ValidationMessageFor(x => x.ReceiverName, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            <strong for="CitySelectListItem">縣市</strong>
+            @Html.DropDownList("CityID", (IEnumerable<SelectListItem>)ViewBag.CitySelectList, new { @class = "form-control" })
+        </div>
+
+        <div class="form-group">
+            <strong for="CountrySelectListItem">鄉鎮市區</strong>
+            @Html.DropDownList("CountryID", (IEnumerable<SelectListItem>)ViewBag.CountrySelectList, new { @class = "form-control" })
+        </div>
+
+        <div class="form-group">
+            <strong>路口號碼</strong>
+            @Html.TextBoxFor(x => x.Line, new { @class = "form-control" })
+        </div>
+
+        <div class="text-center">
+            @Html.ActionLink("返回", "Index", null, new { @class = "btn btn-primary" })
+            <input class="btn btn-primary" type="submit" value="完成結帳" />
+        </div>
+    }
+</div>

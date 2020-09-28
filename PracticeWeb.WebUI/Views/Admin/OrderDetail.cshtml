@@ -1,0 +1,52 @@
+﻿@model PracticeWeb.WebUI.Models.UserOrderViewModel
+
+@{
+    ViewBag.Title = "檢視訂單";
+}
+
+@section CategoryMenu{
+    @Html.Action("Menu", "Admin", new { selectedCategory = "OrderIndex" })
+}
+
+<div style="margin:20px">
+    <h3>訂購紀錄</h3>
+    @if (Model == null)
+    {
+        <div class="alert alert-dismissible alert-success" style="margin:20px;">
+            <strong>沒有訂購紀錄！</strong>
+        </div>
+    }
+    else
+    {
+        <div class="container border" style="margin-top:10px">
+            <h6>收件人：@Model.ReceiverName</h6>
+            <p>下單時間：@Model.Date</p>
+            <p>寄送地址：@Model.ShippingAddress</p>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>商品名稱</th>
+                        <th>數量</th>
+                        <th>單價</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (List<string> product in Model.ProductList)
+                    {
+                        <tr>
+                            <td>
+                                <a href=@Url.RouteUrl(new { controller = "Home", action = "ProductDetail", productID = product[0] })>
+                                    @product[1]
+                                </a>
+                            </td>
+                            <td>@product[2]</td>
+                            <td>@product[3]</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <h6 class="text-right">總價：@Model.ComputeTotalPrice()</h6>
+        </div>
+    }
+</div>
+@Html.ActionLink("返回", "OrderIndex", null, new { @class = "btn btn-primary", style = "margin-top:20px" })

@@ -1,0 +1,101 @@
+﻿@model PracticeWeb.WebUI.Models.AdminUserInfoViewModel
+
+@{
+    ViewBag.Title = "會員資訊";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section CategoryMenu{
+    @Html.Action("Menu", "Admin", new { selectedCategory = "UserIndex" })
+}
+
+<div class="panel panel-default" style="margin:20px;">
+    <div class="panel-heading">
+        <h3>會員資料</h3>
+    </div>
+
+    <div class="panel-body">
+        @Html.ValidationSummary(false)
+
+        <div class="form-group">
+            <h5>ID</h5>
+            <p class="col-sm-10">@Model.ID</p>
+        </div>
+
+        <div class="form-group">
+            <h5>帳號</h5>
+            <p class="col-sm-10">@Model.Name</p>
+        </div>
+
+        <div class="form-group">
+            <h5>Email</h5>
+            <p class="col-sm-10">@Model.Email</p>
+        </div>
+
+        <div class="form-group">
+            <h5>手機</h5>
+            <p class="col-sm-10">@Model.Phone</p>
+        </div>
+
+        <div class="form-group">
+            <h5>縣市</h5>
+            <p class="col-sm-10">@Model.CityName</p>
+        </div>
+
+        <div class="form-group">
+            <h5>鄉鎮市區</h5>
+            <p class="col-sm-10">@Model.CountryName</p>
+        </div>
+
+        <div class="form-group">
+            <h5>路口號碼</h5>
+            <p class="col-sm-10">@Model.AddressLine</p>
+        </div>
+
+        <div style="margin-top:20px">
+            <h3>訂購紀錄</h3>
+            @if (Model.OrderList == null || Model.OrderList.Count() == 0)
+            {
+                <div class="alert alert-dismissible alert-success" style="margin:20px;">
+                    <strong>沒有訂購紀錄！</strong>
+                </div>
+            }
+            else
+            {
+                foreach (PracticeWeb.WebUI.Models.UserOrderViewModel data in Model.OrderList)
+                {
+                    <div class="container border" style="margin-top:10px">
+                        <h6>收件人：@data.ReceiverName</h6>
+                        <p>下單時間：@data.Date</p>
+                        <p>寄送地址：@data.ShippingAddress</p>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>商品名稱</th>
+                                    <th>數量</th>
+                                    <th>單價</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (List<string> product in data.ProductList)
+                                {
+                                    <tr>
+                                        <td>
+                                            <a href=@Url.RouteUrl(new { controller = "Home", action = "ProductDetail", productID = product[0] })>
+                                                @product[1]
+                                            </a>
+                                        </td>
+                                        <td>@product[2]</td>
+                                        <td>@product[3]</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <h6 class="text-right">總價：@data.ComputeTotalPrice()</h6>
+                    </div>
+                }
+            }
+        </div>
+        @Html.ActionLink("返回", "UserIndex", null, new { @class = "btn btn-primary", style = "margin-top:20px" })
+    </div>
+</div>

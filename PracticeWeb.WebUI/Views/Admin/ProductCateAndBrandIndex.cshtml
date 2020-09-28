@@ -1,0 +1,77 @@
+﻿@using PracticeWeb.WebUI.Models
+@model AdminCateAndBrandViewModel
+
+@{
+    ViewBag.Title = "編輯類別";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section CategoryMenu{
+    @Html.Action("Menu", "Admin", new { selectedCategory = "ProductCateAndBrandIndex" })
+}
+
+<div class="panel panel-primary" style="margin:20px;">
+    @Html.ValidationSummary()
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3>產品類別</h3>
+        </div>
+        @using (Html.BeginForm("ProductAddCategory", "Admin", FormMethod.Post, new { @class = "form-group" }))
+        {
+            @Html.AntiForgeryToken()
+            <div class="input-group mb-3">
+                @Html.TextBox("name", "", new { @class = "form-control", style = "max-width:12rem" })
+                <button class="btn btn-outline-primary" type="submit" style="margin-left:4px;">新增類別</button>
+            </div>
+        }
+        <table class="table table-striped">
+            @if (Model.CategoryList.Count() == 0)
+            {
+                <tr><td colspan="3">沒有產品類別</td></tr>
+            }
+            else
+            {
+                <tr><td>ID</td><td>名稱</td><td>產品數量</td></tr>
+                foreach (AdminCateAndBrandModel cate in Model.CategoryList)
+                {
+                    <tr>
+                        <td>@cate.ID</td>
+                        <td>@cate.Name</td>
+                        <td>@cate.Quantity</td>
+                    </tr>
+                }
+            }
+        </table>
+    </div>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3>產品廠商</h3>
+        </div>
+        @using (Html.BeginForm("ProductAddBrand", "Admin", FormMethod.Post, new { @class = "form-group" }))
+        {
+            @Html.AntiForgeryToken()
+            <div class="input-group mb-3">
+                @Html.TextBox("name", "", new { @class = "form-control", style = "max-width:12rem" })
+                <button class="btn btn-outline-primary" type="submit" style="margin-left:4px;">新增廠商</button>
+            </div>
+        }
+        <table class="table table-striped">
+            @if (Model.BrandList.Count() == 0)
+            {
+                <tr><td colspan="3">沒有產品廠商</td></tr>
+            }
+            else
+            {
+                <tr><td>ID</td><td>名稱</td><td>產品數量</td></tr>
+                foreach (AdminCateAndBrandModel brand in Model.BrandList)
+                {
+                    <tr>
+                        <td>@brand.ID</td>
+                        <td>@brand.Name</td>
+                        <td>@brand.Quantity</td>
+                    </tr>
+                }
+            }
+        </table>
+    </div>
+</div>

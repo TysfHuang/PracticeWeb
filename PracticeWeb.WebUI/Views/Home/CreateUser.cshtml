@@ -1,0 +1,102 @@
+﻿@model PracticeWeb.WebUI.Models.CreateAccountModel
+
+@{
+    ViewBag.Title = "註冊新帳號";
+}
+
+@section CategoryMenu{
+    @if (ViewBag.IsAdminAccess != null && ViewBag.IsAdminAccess == true)
+    {
+        @Html.Action("Menu", "Admin", new { selectedCategory = "UserIndex" })
+    }
+    else
+    {
+        @Html.Action("Menu", "Nav")
+    }
+}
+
+<script type="text/javascript">
+    $(document).ready(getJsonWhenCityListChange);
+
+    function getJsonWhenCityListChange() {
+        $("#CityID").change(function () {
+            var strSelected = "";
+            $("#CityID option:selected").each(function () {
+                strSelected += $(this)[0].value;
+            });
+
+            var url = "/Home/GetCountrySelectListItemJson/?cityID=" + strSelected;
+            $.getJSON(url, function (data) {
+                var target = $("#CountryID");
+                target.empty();
+                for (var i = 0; i < data.length; i++) {
+                    var country = data[i];
+                    target.append("<option value=\"" + country.Value + "\" >" + country.Text + "</option>");
+                }
+            });
+        });
+    }
+</script>
+
+<div style="margin:20px;">
+    <h2>註冊帳號</h2>
+    @Html.ValidationSummary(false)
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken();
+        <div class="form-group">
+            <h5>帳號</h5>
+            @Html.TextBoxFor(x => x.Name, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger " })
+        </div>
+
+        <div class="form-group">
+            <h5>密碼</h5>
+            @Html.PasswordFor(x => x.Password, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger " })
+        </div>
+
+        <div class="form-group">
+            <h5>確認密碼</h5>
+            @Html.PasswordFor(x => x.PasswordConfirm, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.PasswordConfirm, "", new { @class = "text-danger " })
+        </div>
+
+        <div class="form-group">
+            <h5>Email</h5>
+            @Html.TextBoxFor(x => x.Email, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger " })
+        </div>
+
+        <div class="form-group">
+            <h5>手機</h5>
+            @Html.TextBoxFor(x => x.Phone, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.Phone, "", new { @class = "text-danger " })
+        </div>
+
+        <div class="form-group">
+            <h5 for="CitySelectListItem">縣市</h5>
+            @Html.DropDownList("CityID", (IEnumerable<SelectListItem>)ViewBag.CitySelectList, new { @class = "form-control" })
+        </div>
+
+        <div class="form-group">
+            <h5 for="CountrySelectListItem">鄉鎮市區</h5>
+            @Html.DropDownList("CountryID", (IEnumerable<SelectListItem>)ViewBag.CountrySelectList, new { @class = "form-control" })
+        </div>
+
+        <div class="form-group">
+            <h5>路口號碼</h5>
+            @Html.TextBoxFor(x => x.ShippingAddress, new { @class = "form-control" })
+        </div>
+
+        <button type="submit" class="btn btn-primary">註冊</button>
+        if (ViewBag.IsAdminAccess != null && ViewBag.IsAdminAccess == true)
+        {
+            @Html.ActionLink("取消", "UserIndex", null, new { @class = "btn btn-outline-danger" })
+        }
+        else
+        {
+            @Html.ActionLink("取消", "Index", null, new { @class = "btn btn-outline-danger" })
+        }
+    }
+</div>

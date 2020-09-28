@@ -1,0 +1,29 @@
+﻿@model PracticeWeb.WebUI.Models.LoginModel
+
+@{
+    ViewBag.Title = "登入";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section CategoryMenu{
+    @Html.Action("Menu", "Nav")
+}
+
+<div style="margin:20px;">
+    @Html.ValidationSummary()
+    <h2 class="h3 mb-3 font-weight-normal">登入</h2>
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="returnUrl" value="@ViewBag.returnUrl" />
+        @Html.TextBoxFor(x => x.Name, new { @class = "form-control", placeholder = "帳號", autofocus = true })
+        @Html.PasswordFor(x => x.Password, new { @class = "form-control", placeholder = "密碼", style = "margin-top:5px;" })
+        <button class="btn btn-primary" type="submit" style="margin-top:5px;">登入</button>
+    }
+    <hr />
+    @using (Html.BeginForm("GoogleLogin", "Account"))
+    {
+        <input type="hidden" name="returnUrl" value="@ViewBag.returnUrl" />
+        <button class="btn btn-primary" type="submit">以 Google 帳號登入</button>
+    }
+</div>

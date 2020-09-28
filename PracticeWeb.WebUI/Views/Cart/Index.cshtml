@@ -1,0 +1,66 @@
+﻿@model PracticeWeb.WebUI.Models.CartIndexViewModel
+
+@{
+    ViewBag.Title = "Tech Store: 購物車";
+}
+
+@section CategoryMenu{
+    @Html.Action("Menu", "Nav")
+}
+
+<div style="margin-top:30px">
+    <h2>購物車</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>數量</th>
+                <th>商品</th>
+                <th class="text-right">單價</th>
+                <th class="text-right">小計</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var line in Model.Cart.Lines)
+            {
+                <tr>
+                    <td class="text-center">@line.Quantity</td>
+                    <td class="text-left">
+                        <a href="@Url.Action("ProductDetail", "Home", new { productID = line.Product.ID})">
+                            @line.Product.Name
+                        </a>
+                    </td>
+                    <td class="text-right">@line.Product.Price.ToString("c0")</td>
+                    <td class="text-right">
+                        @((line.Quantity * line.Product.Price).ToString("c0"))
+                    </td>
+                    <td>
+                        @using (Html.BeginForm("RemoveFromCart", "Cart"))
+                        {
+                            @Html.Hidden("ID", line.Product.ID)
+                            @*@Html.HiddenFor(x => line.Product.ProductID) <-若用這樣的話會渲染成一個名稱為
+                                "line.Product.ProductID"的隱藏字段，跟 RemoveFromCart 函式的參數不匹配*@
+
+                            @Html.HiddenFor(x => x.ReturnUrl) @* <- 名稱為"ReturnUrl"的隱藏字段，值為Model.ReturnUrl*@
+                            @*@Html.Hidden("ReturnUrl", Model.ReturnUrl)*@
+                            <input class="btn btn-sm btn-warning"
+                                   type="submit" value="取消" />
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3" class="text-right">總價:</td>
+                <td class="text-right">
+                    @Model.Cart.ComputeTotalValue().ToString("c0")
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<div class="text-center">
+    @Html.ActionLink("繼續購物", "Index", new { controller = "Home" }, new { @class = "btn btn-primary" })
+    @Html.ActionLink("結帳", "Checkout", null, new { @class = "btn btn-primary" })
+</div>

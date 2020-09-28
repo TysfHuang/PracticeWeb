@@ -1,0 +1,16 @@
+﻿@using PracticeWeb.WebUI.Models
+@model IEnumerable<AdminMenuViewModel>
+
+<div class="container">
+    <div class="btn-block" style="margin-left:10px; margin-top:20px;">
+        @foreach (var data in Model)
+        {
+            @Html.RouteLink(data.DisplayName, new 
+            {
+                controller = data.ControllerName,
+                action = data.ActionName
+            },
+                new { @class = "btn btn-outline-secondary btn-block" + (@data.ActionName == ViewBag.SelectedCategory ? " active" : "") })
+        }
+    </div>
+</div>

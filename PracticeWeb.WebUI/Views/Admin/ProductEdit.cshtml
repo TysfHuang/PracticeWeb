@@ -1,0 +1,95 @@
+﻿@model Practice.Domain.Entities.Product
+
+@{
+    ViewBag.Title = "Admin: " + (ViewBag.IsEditProcess ? "編輯 " + @Model.Name : "新增產品");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section CategoryMenu{
+    @if (ViewBag.IsEditProcess)
+    {
+        @Html.Action("Menu", "Admin", new { selectedCategory = "ProductIndex" })
+    }
+    else
+    {
+        @Html.Action("Menu", "Admin", new { selectedCategory = "ProductCreate" })
+    }
+}
+
+<div class="panel" style="margin:20px;">
+    @Html.ValidationSummary()
+    <div class="panel-heading">
+        @if (ViewBag.IsEditProcess == null)
+        {
+            <span class="field-validation-valid text-danger ">參數錯誤！</span>
+        }
+        @if (ViewBag.IsEditProcess)
+        {
+            <h3>編輯 @Model.Name</h3>
+        }
+        else
+        {
+            <h3>產品新增</h3>
+        }
+    </div>
+
+    @using (Html.BeginForm("ProductEdit", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+        <div class="panel-body">
+            @Html.HiddenFor(m => m.ID)
+            @Html.Hidden("IsEditProcess", (bool)ViewBag.IsEditProcess)
+            <div class="form-group">
+                <label>產品名稱:</label>
+                @Html.TextBoxFor(x => x.Name, new { @class = "form-control" })
+                @Html.ValidationMessageFor(x => x.Name)
+            </div>
+
+            <div class="form-group">
+                <label>產品簡介:</label>
+                @Html.TextAreaFor(x => x.Summary, new { @class = "form-control", rows = 4, spellcheck = "false" })
+                @Html.ValidationMessageFor(x => x.Summary)
+            </div>
+
+            <div class="form-group">
+                <label for="exampleInputFile">產品圖選擇:</label>
+                @if (Model.CoverImagePath != null && Model.CoverImagePath != "default")
+                {
+                    <img class="img-thumbnail" width="150" height="150" src=~/@Model.CoverImagePath />
+                }
+                <input type="file" name="fileToUpload" class="form-control-file" id="fileToUpload2">
+                @if (Model.CoverImagePath == null || Model.CoverImagePath == "")
+                {
+                    Model.CoverImagePath = "default";
+                }
+                @Html.HiddenFor(p => p.CoverImagePath)
+            </div>
+
+            <div class="form-group">
+                <label>價格:</label>
+                @Html.TextBoxFor(x => x.Price, new { @class = "form-control" })
+                @Html.ValidationMessageFor(x => x.Price)
+            </div>
+
+            <div class="form-group">
+                <label>產品廠商:</label>
+                @Html.DropDownList("BrandID", (IEnumerable<SelectListItem>)ViewBag.BrandList, new { @class = "form-control" })
+            </div>
+
+            <div class="form-group">
+                <label>產品類別:</label>
+                @Html.DropDownList("CategoryID", (IEnumerable<SelectListItem>)ViewBag.CategoryList, new { @class = "form-control" })
+            </div>
+
+            <div class="form-group">
+                <label>產品介紹:</label>
+                @Html.TextAreaFor(x => x.Description, new { @class = "form-control", rows = 10, spellcheck = "false" })
+                @Html.ValidationMessageFor(x => x.Description)
+            </div>
+        </div>
+        <div class="panel-footer">
+            <input type="submit" value="儲存" class="btn btn-primary" />
+            @Html.ActionLink("取消", "ProductIndex", null, new { @class = "btn btn-outline-danger" })
+        </div>
+    }
+</div>

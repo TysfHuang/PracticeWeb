@@ -1,0 +1,143 @@
+﻿
+@{
+    ViewBag.Title = "Tech Store";
+}
+
+<script type="text/javascript">
+    function sendAjaxRequest(httpMethod, callback, url) {
+        $.ajax("/api/WebApi" + (url ? "/" + url : ""), {
+            type: httpMethod, success: callback
+        });
+    }
+
+    function getCategoryFromUrl() {
+        var url_string = window.location.href;
+        var url = new URL(url_string);
+        var idx = url_string.indexOf(url.host);
+        if (url_string.indexOf("searchString=") > 0)
+            return "ALL";
+        url_string = url_string.substring(idx + url.host.length - 1, url_string.length);
+        var url_param = url_string.split("/");
+        if (url_param[1] == "")
+            return "ALL";
+        return url_param[1];
+    }
+
+    function getSearchStringFromUrl() {
+        var url_string = window.location.href;
+        var searchKey = "searchString=";
+        var idx = url_string.indexOf(searchKey);
+        if (idx === -1) {
+            return "";
+        }
+        var url_string = url_string.substring(idx + searchKey.length, url_string.length);
+        var url_param = url_string.split("/");
+        if (url_param.length > 1) {
+            return "";
+        }
+        return url_param[0];
+    }
+
+    function sendAndSetProductList(url) {
+        sendAjaxRequest("GET", function (data) {
+            model.productList.removeAll();
+            model.pageList.removeAll();
+            model.cateList.removeAll();
+            for (var i = 0; i < data.Products.length; i++) {
+                model.productList.push(data.Products[i]);
+            }
+            for (var i = 0; i < data.CategoryList.length; i++) {
+                model.cateList.push(data.CategoryList[i]);
+            }
+            for (var i = 1; i <= data.TotalPage; i++) {
+                model.pageList.push(i.toString());
+            }
+        }, url);
+    }
+
+    function getDefaultProductList() {
+        var url = model.choseCategory() + "/1";
+        sendAndSetProductList(url);
+    }
+
+    function getCategoryProductList() {
+        var category = model.choseCategory();
+        var page = model.chosePage();
+        var url = category + "/" + page + "/" + model.searchKey();
+        sendAndSetProductList(url);
+    }
+
+    function ViewModel() {
+        var self = this;
+        self.productList = ko.observableArray();
+        self.pageList = ko.observableArray();
+        self.cateList = ko.observableArray();
+        self.choseCategory = ko.observable(getCategoryFromUrl());
+        self.clickCategory = function (cate) {
+            model.choseCategory(cate);
+            model.chosePage("1");
+            if (cate == "ALL")
+                model.searchKey("");
+            getCategoryProductList();
+        }
+        self.selectCategory = ko.pureComputed(function (data) {
+            return data == model.choseCategory() ? "btn btn-secondary btn-block" : "btn btn-outline-secondary btn-block";
+        }, self);
+        self.chosePage = ko.observable("1");
+        self.clickPage = function (page) {
+            model.chosePage(page);
+            getCategoryProductList();
+        }
+        self.searchKey = ko.observable(getSearchStringFromUrl());
+        self.clickSearch = function (data) {
+            model.choseCategory("ALL");
+            model.chosePage("1");
+            getCategoryProductList();
+        }
+    }
+    var model = new ViewModel();
+
+    $(function () {
+        ko.applyBindings(model);
+        getCategoryProductList();
+    });
+</script>
+
+@section CategoryMenu{
+    <div class="btn-group-vertical" style="margin:20px">
+        <div class="form-group">
+            <div class="input-group mb-3">
+                <input data-bind="value: searchKey" class="form-control mr-sm-2" , placeholder="Search" />
+                <button data-bind="click: clickSearch" class="btn btn-secondary my-2 my-sm-0">搜尋</button>
+            </div>
+        </div>
+        <div class="btn-block" data-bind="foreach: cateList">
+            <button type="button" class="btn btn-outline-secondary btn-block"
+                    data-bind="text: $data,
+                    css: { active: $data === $root.choseCategory() },
+                    click: $root.clickCategory">
+            </button>
+        </div>
+    </div>
+}
+
+<div class="container" style="margin-top:30px">
+    <div class="row text-center text-lg-left" data-bind="foreach: productList">
+        <a data-bind="attr: { href: ProductUrl }">
+            <div class="col-lg-3 col-md-4 col-6" style="margin:10px; max-width: 12rem">
+                <img data-bind="attr:{src: CoverImagePath }" class="img-thumbnail" alt="Cinque Terre">
+                <h6 data-bind="text: Name"></h6>
+                <h5 data-bind="text: '$' + Price" class="mr-2"></h5>
+            </div>
+        </a>
+    </div>
+</div>
+
+<ul class="pagination" data-bind="foreach: pageList">
+    <li class="page-item" data-bind="css: { active: $data === $root.chosePage() }">
+        <button type="button" class="page-link"
+                data-bind="text: $data,
+                click: $root.clickPage">
+        </button>
+    </li>
+</ul>

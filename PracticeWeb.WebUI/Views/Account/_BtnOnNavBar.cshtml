@@ -1,0 +1,32 @@
+﻿@model Dictionary<string, object>
+
+<div style="margin-right: 10px">
+    <ul class="navbar-nav mr-auto">
+        @if ((int)Model["AccountLevel"] >= 0)
+        {
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">@Model["UserName"]</a>
+                <div class="dropdown-menu">
+                    @Html.ActionLink("會員資料", "EditUser", new { controller = "Home" }, new { @class = "dropdown-item" })
+                    @Html.ActionLink("檢視訂單", "ViewOrder", new { controller = "Home" }, new { @class = "dropdown-item" })
+                    @if ((int)Model["AccountLevel"] == 0)
+                    {
+                        @Html.ActionLink("網站管理", "UserIndex", new { controller = "Admin" }, new { @class = "dropdown-item" })
+                    }
+                    <div class="dropdown-divider"></div>
+                    @Html.ActionLink("登出", "Logout", null, new { @class = "dropdown-item" })
+                </div>
+            </li>
+        }
+        else
+        {
+            <li class="nav-item">
+                @Html.ActionLink("登入", "Login", new { returnUrl = Url.Action("Index", "Home") }, new { @class = "nav-link" })
+            </li>
+            <li class="nav-item">
+                @Html.ActionLink("註冊", "CreateUser", new { controller = "Home" }, new { @class = "nav-link" })
+            </li>
+        }
+    </ul>
+</div>
+
