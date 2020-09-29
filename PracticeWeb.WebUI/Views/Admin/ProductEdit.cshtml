@@ -55,7 +55,7 @@
                 <label for="exampleInputFile">產品圖選擇:</label>
                 @if (Model.CoverImagePath != null && Model.CoverImagePath != "default")
                 {
-                    <img class="img-thumbnail" width="150" height="150" src=~/@Model.CoverImagePath />
+                    <img class="img-thumbnail" width="150" height="150" src=@Model.CoverImagePath />
                 }
                 <input type="file" name="fileToUpload" class="form-control-file" id="fileToUpload2">
                 @if (Model.CoverImagePath == null || Model.CoverImagePath == "")

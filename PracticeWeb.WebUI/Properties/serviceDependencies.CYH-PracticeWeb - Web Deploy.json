@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "mssql1": {
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/cyh-techdbserver/databases/Tech",
+      "type": "mssql.azure",
+      "connectionId": "TechStore",
+      "secretStore": "AzureAppSettings"
+    }
+  }
+}

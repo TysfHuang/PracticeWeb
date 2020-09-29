@@ -109,7 +109,7 @@ namespace PracticeWeb.WebUI.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             if (ModelState.IsValid)
             {
-                orderProcessor.ProcessOrder(cart, shippingDetails);
+                //orderProcessor.ProcessOrder(cart, shippingDetails);
                 orderLogger.RecordOrder(cart, CurrentUser.Id, shippingDetails.ReceiverName,
                     repository.GetCityAndCountryName(shippingDetails.CountryID) + shippingDetails.Line);
                 cart.Clear();

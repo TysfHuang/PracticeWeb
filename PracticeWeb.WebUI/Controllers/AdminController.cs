@@ -12,6 +12,9 @@ using Practice.Domain.Entities;
 using Practice.Domain.Concrete;
 using PracticeWeb.WebUI.Infrastructure;
 using System;
+using Azure.Storage.Blobs;
+using System.IO;
+using Azure.Storage.Blobs.Models;
 
 namespace PracticeWeb.WebUI.Controllers
 {
@@ -53,7 +56,7 @@ namespace PracticeWeb.WebUI.Controllers
             int defaultCityId = repository.Cities.OrderBy(c => c.ID).First().ID;
             CityAndCountryPorvider.SetSelectListToViewBag(this, repository, defaultCityId);
             ViewBag.IsAdminAccess = true;
-            if(!CityAndCountryPorvider.CheckIfSelectListOfViewBagCorrect(this))
+            if (!CityAndCountryPorvider.CheckIfSelectListOfViewBagCorrect(this))
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             return View("~/Views/Home/CreateUser.cshtml");
         }
@@ -183,13 +186,13 @@ namespace PracticeWeb.WebUI.Controllers
                     ID = c.ID.ToString(),
                     Name = c.Name,
                     Quantity = c.Products.Count.ToString()
-                }),
+                }).ToList(),
                 BrandList = repository.Brands.Select(b => new AdminCateAndBrandModel
                 {
                     ID = b.ID.ToString(),
                     Name = b.Name,
                     Quantity = b.Products.Count().ToString()
-                })
+                }).ToList()
             };
             return View(data);
         }
@@ -198,7 +201,7 @@ namespace PracticeWeb.WebUI.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult ProductAddCategory(string name)
         {
-            if(String.IsNullOrEmpty(name))
+            if (String.IsNullOrEmpty(name))
             {
                 ModelState.AddModelError("name", "請輸入類別名稱");
                 TempData["message"] = "請輸入類別名稱！";
@@ -253,34 +256,71 @@ namespace PracticeWeb.WebUI.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             ViewBag.IsEditProcess = true;
             BrandAndCategoryProvider.SetSelectListToViewBag(this, repository, product.CategoryID, product.BrandID);
-            if(!BrandAndCategoryProvider.CheckIfSelectListOfViewBagCorrect(this))
+            if (!BrandAndCategoryProvider.CheckIfSelectListOfViewBagCorrect(this))
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             return View(product);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult ProductEdit(Product product, HttpPostedFileBase fileToUpload = null)
+        private string GetUrlOfDefaultImageInBlob()
         {
             try
             {
-                if (product == null || 
+                string connectionString = Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING");
+                BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
+                string containerName = "techstoreimage";
+                BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(containerName);
+                return containerClient.Uri.AbsoluteUri + "/default.jpg";
+            }
+            catch
+            { }
+            return "default.jpg";
+        }
+
+        private async Task<string> UploadImageAsync(HttpPostedFileBase fileToUpload)
+        {
+            try
+            {
+                string connectionString = Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING");
+                BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
+                string containerName = "techstoreimage";
+                BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(containerName);
+                string fileName = Guid.NewGuid().ToString() + ".jpg";
+                BlobClient blobClient = containerClient.GetBlobClient(fileName);
+                BlobUploadOptions blobUploadOptions = new BlobUploadOptions
+                {
+                    HttpHeaders = new BlobHttpHeaders
+                    {
+                        ContentType = "image/jpeg"
+                    }
+                };
+                await blobClient.UploadAsync(fileToUpload.InputStream, blobUploadOptions);
+                return blobClient.Uri.AbsoluteUri;
+            }
+            catch
+            { }
+            return "default.jpg";
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ProductEdit(Product product, HttpPostedFileBase fileToUpload = null)
+        {
+            try
+            {
+                if (product == null ||
                     (product.ID != 0 && !repository.Products.Select(p => p.ID).Contains(product.ID)))
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
                 if (product.CoverImagePath == "default")
-                    product.CoverImagePath = "Image/Product/default.jpg";
+                    product.CoverImagePath = GetUrlOfDefaultImageInBlob();
                 if (ModelState.IsValid)
                 {
                     if (fileToUpload != null)
                     {
-                        string newFileName = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss-FFFFFF") + ".jpg";
-                        string path = System.IO.Path.Combine(Server.MapPath("~/Image/Product/"),
-                            System.IO.Path.GetFileName(newFileName));
-                        fileToUpload.SaveAs(path);
-                        product.CoverImagePath = "Image/Product/" + newFileName;
+                        string fileUrl = await UploadImageAsync(fileToUpload);
+                        product.CoverImagePath = fileUrl;
                     }
 
-                    if(product.ID == 0)
+                    if (product.ID == 0)
                         TempData["message"] = string.Format("{0} 已新增", product.Name);
                     else
                         TempData["message"] = string.Format("{0} 的修改已儲存", product.Name);

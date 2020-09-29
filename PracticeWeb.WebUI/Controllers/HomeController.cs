@@ -298,7 +298,7 @@ namespace PracticeWeb.WebUI.Controllers
         //    dict.Add("User", HttpContext.User.Identity.Name);
         //    dict.Add("Authenticated", HttpContext.User.Identity.IsAuthenticated);
         //    dict.Add("Auth Type", HttpContext.User.Identity.AuthenticationType);
-        //    dict.Add("In Users Role", HttpContext.User.IsInRole("Users"));
+        //    dict.Add("In Users Role", HttpContext.User.IsInRole("Administrators"));
         //    return dict;
         //}
 

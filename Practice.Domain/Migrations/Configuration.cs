@@ -1,5 +1,7 @@
 ﻿namespace Practice.Domain.Migrations
 {
+    using Microsoft.AspNet.Identity;
+    using Microsoft.AspNet.Identity.EntityFramework;
     using Practice.Domain.Concrete;
     using Practice.Domain.Entities;
     using System;
@@ -12,7 +14,7 @@
     {
         public Configuration()
         {
-            AutomaticMigrationsEnabled = false;
+            AutomaticMigrationsEnabled = true;
             ContextKey = "Practice.Domain.Concrete.AppIdentityDbContext";
         }
 
@@ -22,12 +24,45 @@
 
             //  You can use the DbSet<T>.AddOrUpdate() helper extension method
             //  to avoid creating duplicate seed data.
-
-            //PerformInitialProductSetup(context);
-            //PerformInitialCityAndCountrySetup(context);
+            //SetDefaultStoreInfo(context);
+            //SetDefaultCityAndCountryInfo(context);
+            //SetDefaultAccountAndRole(context);
         }
 
-        public void PerformInitialProductSetup(AppIdentityDbContext context)
+        private void SetDefaultAccountAndRole(Practice.Domain.Concrete.AppIdentityDbContext context)
+        {
+            AppUserManager userMgr = new AppUserManager(new UserStore<AppUser>(context));
+            AppRoleManager roleMgr = new AppRoleManager(new RoleStore<AppRole>(context));
+
+            string roleName = "Administrators";
+            string userName = "";
+            string password = "";
+            string email = "@example.com";
+            int CityID = 1;
+            int CountryID = 1;
+
+            if (!roleMgr.RoleExists(roleName))
+            {
+                roleMgr.Create(new AppRole(roleName));
+            }
+
+            AppUser user = userMgr.FindByName(userName);
+            if (user == null)
+            {
+                userMgr.Create(new AppUser { UserName = userName, Email = email, CityID = CityID, CountryID = CountryID },
+                    password);
+                user = userMgr.FindByName(userName);
+            }
+
+            if (!userMgr.IsInRole(user.Id, roleName))
+            {
+                userMgr.AddToRole(user.Id, roleName);
+            }
+
+            context.SaveChanges();
+        }
+
+        public void SetDefaultStoreInfo(AppIdentityDbContext context)
         {
             var brands = new List<Brand>
                 {
@@ -39,7 +74,10 @@
                     new Brand { Name = "MSI"},
                     new Brand { Name = "ASUS"},
                     new Brand { Name = "GIGABYTE"},
-                    new Brand { Name = "EVGA"}
+                    new Brand { Name = "EVGA"},
+                    new Brand { Name = "Google"},
+                    new Brand { Name = "Intel"},
+                    new Brand { Name = "AMD"},
                 };
             brands.ForEach(s => context.Brands.AddOrUpdate(s));
             context.SaveChanges();
@@ -47,49 +85,15 @@
             var categories = new List<Category>
                 {
                     new Category { Name = "Storage" },
-                    new Category { Name = "VideoCard" }
+                    new Category { Name = "VideoCard" },
+                    new Category { Name = "SmartPhone" },
+                    new Category { Name = "CPU" }
                 };
             categories.ForEach(s => context.Categories.AddOrUpdate(s));
             context.SaveChanges();
-
-            var products = new List<Product>
-                {
-                    new Product {Name = "SanDisk Ultra 3D 1TB SSD", BrandID = 1, Description = "Desc", CategoryID = 1, Price = 2988, CoverImagePath = "Image/Product/ia_10001.jpg", Summary = "Summary"},
-                    new Product {Name = "SanDisk Ultra 3D 512GB SSD", BrandID = 1, Description = "Desc", CategoryID = 1, Price = 2099, CoverImagePath = "Image/Product/ia_10002.jpg", Summary = "Summary"},
-                    new Product {Name = "SanDisk Ultra 3D 2TB SSD", BrandID = 1, Description = "Desc", CategoryID = 1, Price = 6899, CoverImagePath = "Image/Product/ia_10003.jpg", Summary = "Summary"},
-                    new Product {Name = "Micron MX500 1TB SSD", BrandID = 2, Description = "Desc", CategoryID = 1, Price = 2988, CoverImagePath = "Image/Product/ia_10004.jpg", Summary = "Summary"},
-                    new Product {Name = "Micron MX550 512GB SSD", BrandID = 2, Description = "Desc", CategoryID = 1, Price = 1988, CoverImagePath = "Image/Product/ia_10005.jpg", Summary = "Summary"},
-                    new Product {Name = "Micron MX550 2TB SSD", BrandID = 2, Description = "Desc", CategoryID = 1, Price = 6988, CoverImagePath = "Image/Product/ia_10006.jpg", Summary = "Summary"},
-                    new Product {Name = "Samsung 860 QVO 1TB SSD", BrandID = 3, Description = "Desc", CategoryID = 1, Price = 2999, CoverImagePath = "Image/Product/ia_10007.jpg", Summary = "Summary"},
-                    new Product {Name = "Samsung 960 OVO 1TB SSD", BrandID = 3, Description = "Desc", CategoryID = 1, Price = 3499, CoverImagePath = "Image/Product/ia_10008.jpg", Summary = "Summary"},
-                    new Product {Name = "Samsung 660 QVO 512GB SSD", BrandID = 3, Description = "Desc", CategoryID = 1, Price = 1999, CoverImagePath = "Image/Product/ia_10009.jpg", Summary = "Summary"},
-                    new Product {Name = "Seagate IronWolf 12TB 3.5", BrandID = 4, Description = "Desc", CategoryID = 1, Price = 11450, CoverImagePath = "Image/Product/ia_10010.jpg", Summary = "Summary"},
-                    new Product {Name = "Seagate IronWolf 4TB 3.5", BrandID = 4, Description = "Desc", CategoryID = 1, Price = 3750, CoverImagePath = "Image/Product/ia_10011.jpg", Summary = "Summary"},
-                    new Product {Name = "Seagate IronWolf 2TB 3.5", BrandID = 4, Description = "Desc", CategoryID = 1, Price = 2490, CoverImagePath = "Image/Product/ia_10012.jpg", Summary = "Summary"},
-                    new Product {Name = "Seagate IronWolf 3TB 3.5", BrandID = 4, Description = "Desc", CategoryID = 1, Price = 3190, CoverImagePath = "Image/Product/ia_10013.jpg", Summary = "Summary"},
-                    new Product {Name = "Seagate IronWolf 4TB 3.5", BrandID = 4, Description = "Desc", CategoryID = 1, Price = 5190, CoverImagePath = "Image/Product/ia_10014.jpg", Summary = "Summary"},
-                    new Product {Name = "WD 紅標 2TB 3.5 NAS HDD", BrandID = 5, Description = "Desc", CategoryID = 1, Price = 2190, CoverImagePath = "Image/Product/ia_10015.jpg", Summary = "Summary"},
-                    new Product {Name = "WD 紅標 4TB 3.5 NAS HDD", BrandID = 5, Description = "Desc", CategoryID = 1, Price = 3890, CoverImagePath = "Image/Product/ia_10016.jpg", Summary = "Summary"},
-                    new Product {Name = "WD 紅標 1TB 3.5 NAS HDD", BrandID = 5, Description = "Desc", CategoryID = 1, Price = 2090, CoverImagePath = "Image/Product/ia_10017.jpg", Summary = "Summary"},
-                    new Product {Name = "WD 紅標 6TB 3.5 NAS HDD", BrandID = 5, Description = "Desc", CategoryID = 1, Price = 5990, CoverImagePath = "Image/Product/ia_10018.jpg", Summary = "Summary"},
-                    new Product {Name = "MSI GeForece RTX 2080 SUPER", BrandID = 6, Description = "Desc", CategoryID = 2, Price = 20900, CoverImagePath = "Image/Product/ia_10019.jpg", Summary = "Summary"},
-                    new Product {Name = "MSI GeForece RTX 2070 SUPER", BrandID = 6, Description = "Desc", CategoryID = 2, Price = 13990, CoverImagePath = "Image/Product/ia_10020.jpg", Summary = "Summary"},
-                    new Product {Name = "MSI GeForece RTX 2060 SUPER", BrandID = 6, Description = "Desc", CategoryID = 2, Price = 11490, CoverImagePath = "Image/Product/ia_10021.jpg", Summary = "Summary"},
-                    new Product {Name = "ASUS ROG Strix GeForece RTX 2080 SUPER", BrandID = 7, Description = "Desc", CategoryID = 2, Price = 22990, CoverImagePath = "Image/Product/ia_10022.jpg", Summary = "Summary"},
-                    new Product {Name = "ASUS ROG Strix GeForece RTX 2070 SUPER", BrandID = 7, Description = "Desc", CategoryID = 2, Price = 16990, CoverImagePath = "Image/Product/ia_10023.jpg", Summary = "Summary"},
-                    new Product {Name = "ASUS ROG Strix GeForece RTX 2060 SUPER", BrandID = 7, Description = "Desc", CategoryID = 2, Price = 13490, CoverImagePath = "Image/Product/ia_10024.jpg", Summary = "Summary"},
-                    new Product {Name = "GIGABYTE GeForece RTX 2080 SUPER", BrandID = 8, Description = "Desc", CategoryID = 2, Price = 23090, CoverImagePath = "Image/Product/ia_10025.jpg", Summary = "Summary"},
-                    new Product {Name = "GIGABYTE GeForece RTX 2070 SUPER", BrandID = 8, Description = "Desc", CategoryID = 2, Price = 15990, CoverImagePath = "Image/Product/ia_10026.jpg", Summary = "Summary"},
-                    new Product {Name = "GIGABYTE GeForece RTX 2060 SUPER", BrandID = 8, Description = "Desc", CategoryID = 2, Price = 11690, CoverImagePath = "Image/Product/ia_10027.jpg", Summary = "Summary"},
-                    new Product {Name = "EVGA GeForece RTX 2080 SUPER", BrandID = 9, Description = "Desc", CategoryID = 2, Price = 22490, CoverImagePath = "Image/Product/ia_10028.jpg", Summary = "Summary"},
-                    new Product {Name = "EVGA GeForece RTX 2070 SUPER", BrandID = 9, Description = "Desc", CategoryID = 2, Price = 15990, CoverImagePath = "Image/Product/ia_10029.jpg", Summary = "Summary"},
-                    new Product {Name = "EVGA GeForece RTX 2060 SUPER", BrandID = 9, Description = "Desc", CategoryID = 2, Price = 12990, CoverImagePath = "Image/Product/ia_10030.jpg", Summary = "Summary"}
-                };
-            products.ForEach(s => context.Products.AddOrUpdate(s));
-            context.SaveChanges();
         }
 
-        public void PerformInitialCityAndCountrySetup(AppIdentityDbContext context)
+        public void SetDefaultCityAndCountryInfo(AppIdentityDbContext context)
         {
             var cities = new List<City>
             {
