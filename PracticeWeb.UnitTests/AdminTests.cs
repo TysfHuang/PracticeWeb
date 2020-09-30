@@ -248,10 +248,11 @@ namespace PracticeWeb.UnitTests
             myMock.ProductRepository.Setup(m => m.SaveProduct(It.IsAny<Product>()));
             AdminController controller = new AdminController(myMock.ProductRepository.Object, myMock.UserManager.Object);
 
-            RedirectToRouteResult result = controller.ProductEdit(p, null) as RedirectToRouteResult;
+            var result = controller.ProductEdit(p, null) as Task<ActionResult>;
+            RedirectToRouteResult viewresult = result.Result as RedirectToRouteResult;
 
             myMock.ProductRepository.Verify(m => m.SaveProduct(p), Times.Once());
-            Assert.AreEqual("ProductIndex", result.RouteValues["action"]);
+            Assert.AreEqual("ProductIndex", viewresult.RouteValues["action"]);
         }
 
         [TestMethod]
@@ -265,9 +266,10 @@ namespace PracticeWeb.UnitTests
             });
             AdminController controller = new AdminController(myMock.ProductRepository.Object, myMock.UserManager.Object);
 
-            ActionResult result = controller.ProductEdit(p, null);
+            var result = controller.ProductEdit(p, null) as Task<ActionResult>;
+            ActionResult viewresult = result.Result as ActionResult;
 
-            Assert.AreEqual(((HttpStatusCodeResult)result).StatusCode, 400);
+            Assert.AreEqual(((HttpStatusCodeResult)viewresult).StatusCode, 400);
         }
 
         [TestMethod]
@@ -283,10 +285,11 @@ namespace PracticeWeb.UnitTests
             AdminController controller = new AdminController(myMock.ProductRepository.Object, myMock.UserManager.Object);
             controller.ViewData.ModelState.AddModelError("error", "error");
 
-            ViewResult result = controller.ProductEdit(p, null) as ViewResult;
+            var result = controller.ProductEdit(p, null) as Task<ActionResult>;
+            ViewResult viewresult = result.Result as ViewResult;
 
             myMock.ProductRepository.Verify(m => m.SaveProduct(p), Times.Never());
-            Assert.AreEqual("", result.ViewName);
+            Assert.AreEqual("", viewresult.ViewName);
         }
 
         [TestMethod]
