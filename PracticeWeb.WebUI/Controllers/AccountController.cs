@@ -114,6 +114,8 @@ namespace PracticeWeb.WebUI.Controllers
                 {
                     Email = loginInfo.Email,
                     UserName = loginInfo.DefaultUserName,
+                    CityID = 1,
+                    CountryID = 1
                 };  //為該user 創建一個新的資料存到DB
                 IdentityResult result = await UserManager.CreateAsync(user);
                 if (!result.Succeeded)
