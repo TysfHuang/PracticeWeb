@@ -7,7 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Claims;
 
-namespace PracticeWeb.WebUI.Infrastructure
+namespace PracticeWeb.WebUI.HtmlHelpers
 {
     public static class IdentityHelpers
     {
@@ -27,8 +27,7 @@ namespace PracticeWeb.WebUI.Infrastructure
                     return new MvcHtmlString(field.Name);
                 }
             }
-            return new MvcHtmlString(string.Format("{0}",
-                claimType.Split('/', '.').Last()));
+            return new MvcHtmlString(string.Format("{0}", claimType.Split('/', '.').Last()));
         }
     }
 }

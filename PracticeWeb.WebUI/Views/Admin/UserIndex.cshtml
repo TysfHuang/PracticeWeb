@@ -15,7 +15,7 @@
         <h3>會員清單</h3>
     </div>
     <table class="table table-striped">
-        <tr><th>ID</th><th>Name</th><th>Email</th><th></th></tr>
+        <tr><th>ID</th><th>Name</th><th>Email</th><th>Actions</th></tr>
         @if (Model.Count() == 0)
         {
             <tr><td colspan="4" class="text-center">No User Accounts</td></tr>
@@ -29,11 +29,14 @@
                     <td>@user.UserName</td>
                     <td>@user.Email</td>
                     <td>
-                        @using (Html.BeginForm("UserDelete", "Admin", new { id = user.Id }))
-                        {
+                        <div class="input-group">
                             @Html.ActionLink("檢視", "UserView", new { id = user.Id }, new { @class = "btn btn-outline-primary" })
-                            <button class="btn btn-outline-danger" type="submit">刪除</button>
-                        }
+                            @using (Html.BeginForm("UserDelete", "Admin", new { id = user.Id }))
+                            {
+                                <button class="btn btn-outline-danger" type="submit">刪除</button>
+                            }
+                        </div>
+                            
                     </td>
                 </tr>
             }

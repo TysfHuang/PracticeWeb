@@ -342,7 +342,7 @@
     <Compile Include="Infrastructure\CityAndCountryPorvider.cs" />
     <Compile Include="Infrastructure\ClaimsAccessAttribute.cs" />
     <Compile Include="Infrastructure\ClaimsRoles.cs" />
-    <Compile Include="Infrastructure\IdentityHelpers.cs" />
+    <Compile Include="HtmlHelpers\IdentityHelpers.cs" />
     <Compile Include="Infrastructure\LocationClaimsProvider.cs" />
     <Compile Include="Infrastructure\NinjectDependencyResolver.cs" />
     <Compile Include="Models\AdminViewModel.cs" />

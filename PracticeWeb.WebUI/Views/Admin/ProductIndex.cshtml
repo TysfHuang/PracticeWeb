@@ -20,7 +20,7 @@
                 <th class="text-right">ID</th>
                 <th>Name</th>
                 <th class="text-right">Price</th>
-                <th class="text-center">Actions</th>
+                <th class="text-left">Actions</th>
             </tr>
             @foreach (var item in Model)
             {
@@ -29,15 +29,16 @@
                     <td>@Html.ActionLink(item.Name, "ProductDetail", new { controller = "Home", productID = item.ID })</td>
                     <td class="text-right">@item.Price.ToString("c0")</td>
                     <td class="text-center">
-
-                        @using (Html.BeginForm("ProductDelete", "Admin"))
-                        {
+                        <div class="input-group">
                             @Html.ActionLink("修改", "ProductEdit", new { id = item.ID }, new { @class = "btn btn-outline-primary" })
-                            @Html.Hidden("ProductID", item.ID)
-                            <input type="submit"
-                                   class="btn btn-outline-danger"
-                                   value="刪除" />
-                        }
+                            @using (Html.BeginForm("ProductDelete", "Admin"))
+                            {
+                                @Html.Hidden("ProductID", item.ID)
+                                <input type="submit"
+                                       class="btn btn-outline-danger"
+                                       value="刪除" />
+                            }
+                        </div>
                     </td>
                 </tr>
             }
