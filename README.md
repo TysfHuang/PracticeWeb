@@ -22,10 +22,5 @@
 4. 指定權限給會員
 5. 新增商品廠商與商品類別
 
-## 使用的Azure服務
-1. App Service
-2. SQL 資料庫
-3. 儲存體帳戶：存放商品的封面圖
-
 ## SQL 資料庫結構
 ![image](https://github.com/TysfHuang/PracticeWeb/blob/master/PracticeWeb_DB_Struct_1.jpg)
