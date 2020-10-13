@@ -18,7 +18,7 @@
             return "ALL";
         url_string = url_string.substring(idx + url.host.length - 1, url_string.length);
         var url_param = url_string.split("/");
-        if (url_param[1] == "")
+        if (url_param[1] == "" || url_param[1] == "#")
             return "ALL";
         return url_param[1];
     }
